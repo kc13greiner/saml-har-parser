@@ -1,0 +1,88 @@
+<div>
+    <h1>{{ title }}</h1>
+    <h2>Delightfully Brutalist</h2>
+</div>
+
+<!--Create a place to drag and drop a HAR file that the AppComponent can send to my Node.js endpoint-->
+<div class="drop-area" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+    <p>Drag and drop a HAR file into the Black Hole!</p>
+    <img priority src="blackhole2.jpeg" alt="Black Hole Image" height="137" width="137">
+</div>
+
+
+<div *ngIf="timings.earliest && timings.latest">
+    <h2>Log Timings</h2>
+    <p><strong>Earliest Log:</strong> {{ timings.earliest.startedDateTime | date:'MMM d, YYYY @ HH:mm:ss.SSS' : 'GMT' }}
+        <button (click)="copyToClipboard(timings.earliest.startedDateTime )">Copy Discover Format</button>
+    </p>
+    <p><strong>Latest Log:</strong> {{ timings.latest.startedDateTime | date:'MMM d, YYYY @ HH:mm:ss.SSS' : 'GMT' }}
+        <button (click)="copyToClipboard(timings.latest.startedDateTime )">Copy Discover Format</button>
+    </p>
+</div>
+
+<div *ngIf="entries && entries.size > 0">
+    <h2>Overview</h2>
+    <table border="1px">
+        <thead>
+        <tr>
+            <th>Request URL</th>
+            <th>Request Method</th>
+            <th>Response Status</th>
+            <th>Local Start Time</th>
+            <th>GMT</th>
+            <th>Copy GMT Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <ng-container *ngFor="let key of entries.keys()">
+            <tr *ngFor="let entry of entries.get(key)">
+                <td>{{ entry.request.url }}</td>
+                <td>{{ entry.request.method }}</td>
+                <td>{{ entry.response.status }}</td>
+                <td>{{ entry.startedDateTime | date:'MMM d, YYYY @ HH:mm:ss.SSS'}}</td>
+                <td>{{ entry.startedDateTime | date:'MMM d, YYYY @ HH:mm:ss.SSS' : 'GMT' }}</td>
+                <td>
+                    <button (click)="copyToClipboard(entry.startedDateTime)">Copy GMT Time</button>
+                </td>
+            </tr>
+        </ng-container>
+        </tbody>
+    </table>
+</div>
+
+<div *ngIf="hostnameCheckOutput.loginDomain || hostnameCheckOutput.callbackDomain">
+    <h2>Hostname Check Output</h2>
+    <div *ngFor="let key of Object.keys(hostnameCheckOutput)">
+        <strong>{{ key }}:</strong>
+        <span [ngStyle]="{ 'color': key === 'loginDomainMatchesCallbackDomain' && hostnameCheckOutput[key] === false ? 'red' : 'black' }">
+            {{ hostnameCheckOutput[key] }}
+        </span>
+    </div>
+</div>
+
+<div *ngIf="samlCallbackWithResponse.length > 0">
+    <h2>SAML Callback Responses</h2>
+    <table border="1px">
+        <thead>
+        <tr>
+            <th>Request URL</th>
+            <th>Response Content</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let entry of samlCallbackWithResponse">
+            <td>{{ entry.url }}</td>
+            <td>
+                <button (click)="entry.showContent = !entry.showContent">
+                    {{ entry.showContent ? 'Hide' : 'Show' }} Response
+                </button>
+                <div *ngIf="entry.showContent">
+                    <pre>InResponseTo: {{ entry.inResponseTo }}</pre>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
